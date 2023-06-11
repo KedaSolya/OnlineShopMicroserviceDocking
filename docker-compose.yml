@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  database:
+    image: mysql
+    container_name: database_shop
+    ports:
+      - target: 3306
+        published: 3306
+    environment:
+      - MYSQL_DATABASE=online_shop_15
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=rootroot
+      - MYSQL_ROOT_PASSWORD=rootroot
+    volumes:
+      - ./data.sql/:docker-entrypoint-initdb.d/data.sql
+
+  user-service:
+    build: user-service/
+    container_name: user-service
+    depends_on:
+      - goods-service
+      - database
+    ports:
+      - target: 8080
+        published: 8080
+
+  goods-service:
+    build: goods-service/
+    container_name: goods-service
+    ports:
+      - target: 8081
+        published: 8081
+    depends_on:
+      - database
+
+#  database:
+#    image: postgres
+#    ports:
+#      - "5432:5432"
+#    environment:
+#      - POSTGRES_PASSWORD=post
+#      - POSTGRES_DB=online_shop_15
